@@ -1,34 +1,67 @@
 import React from 'react';
 import { 
   Text, 
-  View,
   Platform,
-  TextInput,
   StyleSheet, 
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  ImageBackground
 } from 'react-native';
+import SearchInput from './src/components/SearchInput'
+import { fetchLocationId, fetchWeatherId } from './src/api'
+
 
 export default class App extends React.Component {
+
+  state = {
+    text: '',
+    location: '',
+    weather: '',
+    temperature: ''
+  }
+
+  _handleChangeText = (text) => {
+    this.setState( { text } )
+  }
+
+  _handleSubmit = async () => {
+    const { text } = this.state
+
+    if( !text )  return
+
+      this.setState({ location: text })
+      this.setState({text: ''})
+
+      const locationData = await fetchLocationId (text)
+      const woeid = locationData[0].woeid
+      
+      const weatherData = await fetchWeatherId ( woeid )
+      const {weather, temperature} = weatherData
+      this.setState({weather, temperature})
+  }
+
   render() {
+    const {location, weather, temperature} = this.state
     return (
       <KeyboardAvoidingView 
         style={styles.container}
         behavior="padding"
       >
-        <Text style={[styles.largeText, styles.textStyle]}>San Francisco</Text>
-        <Text style={[styles.smallText, styles.textStyle]}>Clear</Text>
-        <Text style={[styles.largeText, styles.textStyle]}>15°</Text>
-        <TextInput
-          style={styles.textInput}
-          //autoFocus
-          clearButtonMode="while-editing"
-         // value="hello cosmo"
-         maxLength={10}
-         placeholder="Search any city"
-         returnKeyType="search"
-         // secureTextEntry -> para input de password
-         placeholderTextColor="#55968f"
+      
+      <ImageBackground
+        source={require ('./assets/bg/clear.png')}
+        style={styles.imageBackground}
+      >
+
+        <Text style={[styles.largeText, styles.textStyle]}>{location}</Text>
+        <Text style={[styles.smallText, styles.textStyle]}>{weather}</Text>
+        <Text style={[styles.largeText, styles.textStyle]}>{Math.round(temperature)}°</Text>
+        <SearchInput
+          placeholder="Search a cool city"
+          handleChangeText = { this._handleChangeText}
+          value={this.state.text}
+          onSubmit={this._handleSubmit}
         />
+        </ImageBackground>
       </KeyboardAvoidingView>
     );
   }
@@ -37,8 +70,6 @@ export default class App extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   largeText:{
     fontSize: 44
@@ -49,14 +80,11 @@ const styles = StyleSheet.create({
   textStyle:{
     fontFamily: Platform.OS === 'ios' ? 'AvenirNext-Regular' : 'Roboto'
   },
-  textInput:{
-    backgroundColor: '#bdc3c7',
-    height: 40,
-    width: 300,
-    marginTop: 20,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    color: 'white',
-    elevation: 5, // para ponerle sombrita en andrioid
+
+  imageBackground:{
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   }
+ 
 });
