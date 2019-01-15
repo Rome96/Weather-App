@@ -3,14 +3,15 @@ import {
   Text,
   Platform,
   StyleSheet,
-  KeyboardAvoidingView,
   ImageBackground,
-  ActivityIndicator
+  ActivityIndicator,
+  KeyboardAvoidingView
 } from 'react-native';
+
 import SearchInput from './src/components/SearchInput'
 import { fetchLocationId, fetchWeatherId } from './src/api'
 import getWeatherBackground from './src/utils/getWeatherBackground'
-
+//-------------------------------------------------------------------------
 
 export default class App extends React.Component {
 
@@ -22,21 +23,22 @@ export default class App extends React.Component {
     isLoading: false,
     error: false
   }
-
+//-------------------------------------------------
   componentDidMount() {
     //buscar clima por defecto
     this._searchWeather("San Francisco")
   }
-
+//-------------------------------------------------------
   _handleChangeText = (text) => this.setState({ text })
-
+//-------------------------------------------------------
   _handleSubmit = () => {
     const { text } = this.state
+
     if (!text) return
     this._searchWeather(text)
     this.setState({ text: '' })
   }
-
+//--------------------------------------------------------
   _searchWeather = async (location) => {
 
     try {
@@ -56,7 +58,7 @@ export default class App extends React.Component {
       })
     }
   }
-
+//------------------------------------------------------------
   render() {
     const { city, weather, temperature, isLoading, error } = this.state
     return (
